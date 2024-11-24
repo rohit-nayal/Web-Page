@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finance Tracker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            
+            background: url('https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExdDFyYmRpZ3IyZnBhMmExZ2xwdWdzc3B6M2tkMjc4bTAyZTd6dG8zbiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/eJvsB9z0EJPIbsFz7k/giphy-downsized-large.gif') no-repeat center center fixed;
+            background-size: cover;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 30px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .title {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .transaction-form {
+            margin-bottom: 20px;
+        }
+
+        .transaction-form label {
+            font-weight: 500;
+            margin-bottom: 5px;
+            display: block;
+            color: #333;
+        }
+
+        .transaction-form input,
+        .transaction-form select {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+
+        .add-button {
+            background-color: #4f46e5;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            width: 100%;
+            transition: background-color 0.3s ease;
+        }
+
+        .add-button:hover {
+            background-color: #1e1b4b;
+        }
+
+        .transaction-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .transaction-name, .transaction-amount {
+            font-size: 1.1rem;
+        }
+
+        .income {
+            color: #43a047;
+            font-weight: 600;
+        }
+
+        .expense {
+            color: #e53935;
+            font-weight: 600;
+        }
+
+        .delete-button {
+            background-color: #f44336;
+            color: white;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .delete-button:hover {
+            background-color: #d32f2f;
+        }
+
+        .total {
+            font-size: 1.2rem;
+            margin-top: 10px;
+            font-weight: 500;
+            color: #333;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .balance {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">Finance Tracker</h1>
+        <form class="transaction-form" id="transaction-form">
+            <label for="name">Transaction Name</label>
+            <input id="name" type="text" placeholder="Enter transaction name" required />
+
+            <label for="amount">Transaction Amount</label>
+            <input id="amount" type="number" placeholder="Enter amount" required />
+
+            <label for="type">Transaction Type</label>
+            <select id="type">
+                <option value="income">Income</option>
+                <option value="expense">Expense</option>
+            </select>
+
+            <button type="submit" class="add-button">Add Transaction</button>
+        </form>
+
+        <ul class="transaction-list" id="transaction-list"></ul>
+
+        <div class="total">
+            <p>Total Income:</p>
+            <p id="total-income">0</p>
+        </div>
+        <div class="total">
+            <p>Total Expense:</p>
+            <p id="total-expense">0</p>
+        </div>
+        <div class="total balance">
+            <p>Balance:</p>
+            <p id="balance">0</p>
+        </div>
+    </div>
+
+    <script>
+        const transactionForm = document.getElementById('transaction-form');
+        const transactionList = document.getElementById('transaction-list');
+        const totalIncomeElement = document.getElementById('total-income');
+        const totalExpenseElement = document.getElementById('total-expense');
+        const balanceElement = document.getElementById('balance');
+
+        let transactions = [];
+
+        const updateTotals = () => {
+            const totalIncome = transactions
+                .filter(t => t.type === 'income')
+                .reduce((acc, t) => acc + t.amount, 0);
+            const totalExpense = transactions
+                .filter(t => t.type === 'expense')
+                .reduce((acc, t) => acc + t.amount, 0);
+            const balance = totalIncome - totalExpense;
+
+            totalIncomeElement.textContent = `${totalIncome}`;
+            totalExpenseElement.textContent = `${totalExpense}`;
+            balanceElement.textContent = `${balance}`;
+        };
+
+        transactionForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('name').value;
+            const amount = parseFloat(document.getElementById('amount').value);
+            const type = document.getElementById('type').value;
+
+            const transaction = { name, amount, type };
+            transactions.push(transaction);
+
+            const transactionItem = document.createElement('li');
+            transactionItem.classList.add('transaction-item');
+            transactionItem.innerHTML = `
+                <span class="transaction-name">${name}</span>
+                <span class="transaction-amount ${type === 'income' ? 'income' : 'expense'}">${amount}</span>
+                <button class="delete-button">Delete</button>
+            `;
+
+            transactionList.appendChild(transactionItem);
+
+            const deleteButton = transactionItem.querySelector('.delete-button');
+            deleteButton.addEventListener('click', () => {
+                const index = transactions.findIndex(t => t.name === name && t.amount === amount && t.type === type);
+                if (index !== -1) {
+                    transactions.splice(index, 1);
+                    transactionList.removeChild(transactionItem);
+                }
+                updateTotals();
+            });
+
+            updateTotals();
+            transactionForm.reset();
+        });
+    </script>
+</body>
+</html>

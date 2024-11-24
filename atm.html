@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATM Interface</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        
+            background-image: url('https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExczVmNGMxbmFxcWVlbWVicDZtdXk2dWtlNWlkNndmb3E2d3NlZ3IybiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3owvKodxD81U3RqVPy/giphy.gif'); 
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-repeat: no-repeat;
+        }
+
+        .atm-container {
+            width: 400px;
+            background-color: rgba(255, 255, 255, 0.9); 
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+        }
+
+        .screen {
+            background-color: #ffffff;
+            border: 1px solid #e5e5e5;
+            border-radius: 12px;
+            padding: 25px;
+        }
+
+        h2 {
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        input[type="password"],
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #dcdcdc;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 1rem;
+            color: #333;
+        }
+
+        .buttons {
+            margin-top: 20px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 12px;
+            background-color: #4a90e2;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #357ABD;
+        }
+
+        .back-btn {
+            background-color: #95a5a6;
+            margin-top: 20px;
+        }
+
+        button.back-btn:hover {
+            background-color: #7f8c8d;
+        }
+
+        .error {
+            color: #e74c3c;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        #mini-statement-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        #mini-statement-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #ccc;
+        }
+
+    
+        .home-screen p,
+        .mini-statement-screen ul {
+            text-align: left;
+            color: #333;
+        }
+
+        .mini-statement-screen ul {
+            padding-left: 15px;
+        }
+
+        .home-screen p {
+            margin-bottom: 15px;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="atm-container">
+        <div class="screen" id="screen">
+            
+            <div class="login-screen" id="login-screen">
+                <h2>Hello, User</h2>
+                <h2>Enter PIN</h2>
+                <input type="password" id="pin" placeholder="PIN">
+                <button id="login-btn">Login</button>
+                <p id="error" class="error"></p>
+            </div>
+
+    
+            <div class="home-screen" id="home-screen" style="display: none;">
+                <h2>Account Information</h2>
+                <p>Account Number: 1234567890</p>
+                <p>Balance: ₹ <span id="balance">1000</span></p>
+                <div class="buttons">
+                    <button id="deposit-btn">Deposit</button>
+                    <button id="withdrawal-btn">Withdrawal</button>
+                    <button id="pin-change-btn">Change PIN</button>
+                    <button id="mini-statement-btn">Mini Statement</button>
+                </div>
+            </div>
+
+            
+            <div class="deposit-screen" id="deposit-screen" style="display: none;">
+                <h2>Deposit</h2>
+                <input type="number" id="deposit-amount" placeholder="Amount (in ₹)">
+                <button id="deposit-btn-2">Deposit</button>
+                <p id="error-deposit" class="error"></p>
+                <button class="back-btn" id="back-home-1">Back to Home</button>
+            </div>
+
+            
+            <div class="withdrawal-screen" id="withdrawal-screen" style="display: none;">
+                <h2>Withdrawal</h2>
+                <input type="number" id="withdrawal-amount" placeholder="Amount (in ₹)">
+                <button id="withdrawal-btn-2">Withdraw</button>
+                <p id="error-withdrawal" class="error"></p>
+                <button class="back-btn" id="back-home-2">Back to Home</button>
+            </div>
+
+            
+            <div class="pin-change-screen" id="pin-change-screen" style="display: none;">
+                <h2>Change PIN</h2>
+                <input type="password" id="new-pin" placeholder="New PIN">
+                <input type="password" id="confirm-new-pin" placeholder="Confirm New PIN">
+                <button id="pin-change-btn-2">Change PIN</button>
+                <p id="error-pin" class="error"></p>
+                <button class="back-btn" id="back-home-3">Back to Home</button>
+            </div>
+
+            
+            <div class="mini-statement-screen" id="mini-statement-screen" style="display: none;">
+                <h2>Mini Statement</h2>
+                <ul id="mini-statement-list"></ul>
+                <button class="back-btn" id="back-home-4">Back to Home</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let account = {
+            accountNumber: '1234567890',
+            pin: '1234',
+            balance: 1000,
+            transactions: []
+        };
+
+        let currentScreen = 'login-screen';
+
+        document.getElementById('login-btn').addEventListener('click', handleLogin);
+        document.getElementById('deposit-btn').addEventListener('click', showDepositScreen);
+        document.getElementById('withdrawal-btn').addEventListener('click', showWithdrawalScreen);
+        document.getElementById('pin-change-btn').addEventListener('click', showPinChangeScreen);
+        document.getElementById('mini-statement-btn').addEventListener('click', showMiniStatementScreen);
+        document.getElementById('deposit-btn-2').addEventListener('click', handleDeposit);
+        document.getElementById('withdrawal-btn-2').addEventListener('click', handleWithdrawal);
+        document.getElementById('pin-change-btn-2').addEventListener('click', handlePinChange);
+
+    
+        document.getElementById('back-home-1').addEventListener('click', showHomeScreen);
+        document.getElementById('back-home-2').addEventListener('click', showHomeScreen);
+        document.getElementById('back-home-3').addEventListener('click', showHomeScreen);
+        document.getElementById('back-home-4').addEventListener('click', showHomeScreen);
+
+        function handleLogin() {
+            let pin = document.getElementById('pin').value;
+            if (pin !== account.pin) {
+                document.getElementById('error').innerHTML = 'Invalid PIN';
+                return;
+            }
+            document.getElementById('error').innerHTML = '';
+            showHomeScreen();
+        }
+
+        function showHomeScreen() {
+            document.getElementById(currentScreen).style.display = 'none';
+            currentScreen = 'home-screen';
+            document.getElementById(currentScreen).style.display = 'block';
+        }
+
+        function showDepositScreen() {
+            document.getElementById(currentScreen).style.display = 'none';
+            currentScreen = 'deposit-screen';
+            document.getElementById(currentScreen).style.display = 'block';
+        }
+
+        function showWithdrawalScreen() {
+            document.getElementById(currentScreen).style.display = 'none';
+            currentScreen = 'withdrawal-screen';
+            document.getElementById(currentScreen).style.display = 'block';
+        }
+
+        function showPinChangeScreen() {
+            document.getElementById(currentScreen).style.display = 'none';
+            currentScreen = 'pin-change-screen';
+            document.getElementById(currentScreen).style.display = 'block';
+        }
+
+        function showMiniStatementScreen() {
+            document.getElementById(currentScreen).style.display = 'none';
+            currentScreen = 'mini-statement-screen';
+            document.getElementById(currentScreen).style.display = 'block';
+            displayMiniStatement();
+        }
+
+        function handleDeposit() {
+            let amount = parseInt(document.getElementById('deposit-amount').value);
+            if (isNaN(amount) || amount <= 0) {
+                document.getElementById('error-deposit').innerHTML = 'Invalid amount';
+                return;
+            }
+            account.balance += amount;
+            document.getElementById('balance').innerHTML = account.balance;
+            let transaction = {
+                type: 'deposit',
+                amount: amount,
+                date: new Date().toLocaleString()
+            };
+            account.transactions.push(transaction);
+            document.getElementById('error-deposit').innerHTML = '';
+            showHomeScreen();
+        }
+
+        function handleWithdrawal() {
+            let amount = parseInt(document.getElementById('withdrawal-amount').value);
+            if (isNaN(amount) || amount <= 0 || amount > account.balance) {
+                document.getElementById('error-withdrawal').innerHTML = 'Invalid amount';
+                return;
+            }
+            account.balance -= amount;
+            document.getElementById('balance').innerHTML = account.balance;
+            let transaction = {
+                type: 'withdrawal',
+                amount: amount,
+                date: new Date().toLocaleString()
+            };
+            account.transactions.push(transaction);
+            document.getElementById('error-withdrawal').innerHTML = '';
+            showHomeScreen();
+        }
+
+        function handlePinChange() {
+            let newPin = document.getElementById('new-pin').value;
+            let confirmNewPin = document.getElementById('confirm-new-pin').value;
+            if (newPin !== confirmNewPin) {
+                document.getElementById('error-pin').innerHTML = 'New PIN and confirm PIN do not match';
+                return;
+            }
+            account.pin = newPin;
+            document.getElementById('error-pin').innerHTML = '';
+            showHomeScreen();
+        }
+
+        function displayMiniStatement() {
+            let miniStatementList = document.getElementById('mini-statement-list');
+            miniStatementList.innerHTML = '';
+            account.transactions.forEach((transaction, index) => {
+                let listItem = document.createElement('li');
+                listItem.innerHTML = `${transaction.type === 'deposit' ? 'Deposit' : 'Withdrawal'}: ₹${transaction.amount} on ${transaction.date}`;
+                miniStatementList.appendChild(listItem);
+            });
+        }
+    </script>
+</body>
+</html>
